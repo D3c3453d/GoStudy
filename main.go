@@ -34,5 +34,25 @@ func main() {
 				fmt.Println(userName)
 			}
 		}
+		if input == "/all" {
+			for userName := range dict {
+				fmt.Println(userName)
+			}
+		}
+		if input == "/phone" {
+			var userName string
+			fmt.Print("Enter username: ")
+			fmt.Scanln(&userName)
+			fmt.Printf("%s's phone number:\n%s\n", userName, dict[userName]["Phone"])
+		}
+		if input == "/desc" {
+			var userName string
+			fmt.Print("Enter username: ")
+			fmt.Scanln(&userName)
+			fmt.Printf("%s's description:\n%s\n", userName, dict[userName]["Description"])
+		}
+		if input == "/exit" {
+			break
+		}
 	}
 }
