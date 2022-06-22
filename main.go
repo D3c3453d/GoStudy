@@ -45,6 +45,10 @@ func desc(dict map[string]map[string]string) {
 	fmt.Printf("%s's description: %s\n", userName, dict[userName]["Description"])
 }
 
+func find(dict map[string]map[string]string) {
+
+}
+
 func main() {
 	dict := map[string]map[string]string{}
 	var input string
