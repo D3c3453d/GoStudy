@@ -7,6 +7,7 @@ func help(dict map[string]map[string]string) {
 	fmt.Println("/all to see all accounts")
 	fmt.Println("/desc to see description of the account")
 	fmt.Println("/phone to see phone of the account")
+	fmt.Println("/find to find by phone number")
 }
 
 func add(dict map[string]map[string]string) {
@@ -46,7 +47,16 @@ func desc(dict map[string]map[string]string) {
 }
 
 func find(dict map[string]map[string]string) {
-
+	var userPhone string
+	fmt.Print("Enter phone number: ")
+	fmt.Scanln(&userPhone)
+	for userName := range dict {
+		if userPhone == dict[userName]["Phone"] {
+			fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
+			return
+		}
+	}
+	fmt.Println("Not found")
 }
 
 func main() {
@@ -65,6 +75,8 @@ func main() {
 			phone(dict)
 		case "/desc":
 			desc(dict)
+		case "/find":
+			find(dict)
 		case "/exit":
 			break
 		default:
