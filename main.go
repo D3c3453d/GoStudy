@@ -25,8 +25,14 @@ func main() {
 			fmt.Scanln(&userPhone)
 			fmt.Print("Enter your description: ")
 			fmt.Scanln(&userDesc)
+			dict[userName] = map[string]string{}
 			dict[userName]["Phone"] = userPhone
 			dict[userName]["Description"] = userDesc
+		}
+		if input == "/all" {
+			for userName := range dict {
+				fmt.Println(userName)
+			}
 		}
 	}
 }
