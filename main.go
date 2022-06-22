@@ -47,6 +47,7 @@ func desc(dict map[string]map[string]string) {
 
 func show(dict map[string]map[string]string) {
 	var userName string
+
 	fmt.Print("Enter username: ")
 	fmt.Scanln(&userName)
 	fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
