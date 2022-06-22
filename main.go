@@ -45,6 +45,14 @@ func desc(dict map[string]map[string]string) {
 	fmt.Printf("%s's description: %s\n", userName, dict[userName]["Description"])
 }
 
+func show(dict map[string]map[string]string) {
+	var userName string
+	fmt.Print("Enter username: ")
+	fmt.Scanln(&userName)
+	fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
+	fmt.Printf("%s's description: %s\n", userName, dict[userName]["Description"])
+}
+
 func main() {
 	dict := map[string]map[string]string{}
 	var input string
@@ -61,6 +69,8 @@ func main() {
 			phone(dict)
 		case "/desc":
 			desc(dict)
+		case "/show":
+			show(dict)
 		case "/exit":
 			break
 		default:
