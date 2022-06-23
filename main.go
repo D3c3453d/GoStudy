@@ -6,7 +6,7 @@ func help(dict map[string]map[string]string) {
 	fmt.Println("/add to add new account")
 	fmt.Println("/all to see all accounts")
 	fmt.Println("/desc to see description of the account")
-	fmt.Println("/phone to see phone of the account")
+	fmt.Println("/phone to see phone number of the account")
 	fmt.Println("/find to find by phone number")
 }
 
