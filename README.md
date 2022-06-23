@@ -6,4 +6,4 @@ This is simple dictionary, where you can:
 4. View account description
 5. Find account by phone number
 
-Use /help to see all this commands
+Use **/help** to see all this commands
