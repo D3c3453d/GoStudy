@@ -2,7 +2,23 @@ package main
 
 import "fmt"
 
-func help() {
+type Account struct {
+	userName  string
+	userPhone string
+	userDesc  string
+}
+
+type Dict struct {
+	dict map[string]Account
+}
+
+func NewDict() *Dict {
+	var d Dict
+	d.dict = make(map[string]Account)
+	return &d
+}
+
+func (d *Dict) help() {
 	fmt.Println("/add to add new account")
 	fmt.Println("/all to see all accounts")
 	fmt.Println("/desc to see description of the account")
@@ -10,58 +26,54 @@ func help() {
 	fmt.Println("/find to find by phone number")
 }
 
-func add(dict map[string]map[string]string) {
-	var userName string
-	var userPhone string
-	var userDesc string
+func (d *Dict) add() {
+	var account Account
 
-	fmt.Print("Enter your username: ")
-	fmt.Scanln(&userName)
-	fmt.Print("Enter your phone number: ")
-	fmt.Scanln(&userPhone)
-	fmt.Print("Enter your description: ")
-	fmt.Scanln(&userDesc)
-	dict[userName] = map[string]string{}
-	dict[userName]["Phone"] = userPhone
-	dict[userName]["Description"] = userDesc
+	fmt.Print("Enter your username:\n")
+	fmt.Scan(&account.userName)
+	fmt.Print("Enter your phone number:\n")
+	fmt.Scan(&account.userPhone)
+	fmt.Print("Enter your description:\n")
+	fmt.Scan(&account.userDesc)
+	d.dict[account.userName] = account
 }
 
-func all(dict map[string]map[string]string) {
-	for userName := range dict {
+func (d *Dict) all() {
+	for userName := range d.dict {
 		fmt.Println(userName)
 	}
 }
 
-func phone(dict map[string]map[string]string) {
+func (d *Dict) phone() {
 	var userName string
-	fmt.Print("Enter username: ")
-	fmt.Scanln(&userName)
-	fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
+	fmt.Print("Enter username:\n")
+	fmt.Scan(&userName)
+	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
 }
 
-func desc(dict map[string]map[string]string) {
+func (d *Dict) desc() {
 	var userName string
-	fmt.Print("Enter username: ")
-	fmt.Scanln(&userName)
-	fmt.Printf("%s's description: %s\n", userName, dict[userName]["Description"])
+	fmt.Print("Enter username:\n")
+	fmt.Scan(&userName)
+	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
 }
 
-func show(dict map[string]map[string]string) {
+func (d *Dict) show() {
 	var userName string
 
-	fmt.Print("Enter username: ")
-	fmt.Scanln(&userName)
-	fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
-	fmt.Printf("%s's description: %s\n", userName, dict[userName]["Description"])
+	fmt.Print("Enter username:\n")
+	fmt.Scan(&userName)
+	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
+	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
 }
 
-func find(dict map[string]map[string]string) {
+func (d *Dict) find() {
 	var userPhone string
-	fmt.Print("Enter phone number: ")
-	fmt.Scanln(&userPhone)
-	for userName := range dict {
-		if userPhone == dict[userName]["Phone"] {
-			fmt.Printf("%s's phone number: %s\n", userName, dict[userName]["Phone"])
+	fmt.Print("Enter phone number:\n")
+	fmt.Scan(&userPhone)
+	for userName := range d.dict {
+		if userPhone == d.dict[userName].userPhone {
+			fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
 			return
 		}
 	}
@@ -69,25 +81,25 @@ func find(dict map[string]map[string]string) {
 }
 
 func main() {
-	dict := map[string]map[string]string{}
+	dict := NewDict()
 	var input string
 	for {
-		fmt.Scanln(&input)
+		fmt.Scan(&input)
 		switch input {
 		case "/help":
-			help()
+			dict.help()
 		case "/add":
-			add(dict)
+			dict.add()
 		case "/all":
-			all(dict)
+			dict.all()
 		case "/phone":
-			phone(dict)
+			dict.phone()
 		case "/desc":
-			desc(dict)
+			dict.desc()
 		case "/find":
-			find(dict)
+			dict.find()
 		case "/show":
-			show(dict)
+			dict.show()
 		case "/exit":
 			break
 		default:
