@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func help(dict map[string]map[string]string) {
+func help() {
 	fmt.Println("/add to add new account")
 	fmt.Println("/all to see all accounts")
 	fmt.Println("/desc to see description of the account")
@@ -75,7 +75,7 @@ func main() {
 		fmt.Scanln(&input)
 		switch input {
 		case "/help":
-			help(dict)
+			help()
 		case "/add":
 			add(dict)
 		case "/all":
