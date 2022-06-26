@@ -1,6 +1,34 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+//Commands config
+type Commands struct {
+	Help  string
+	Add   string
+	All   string
+	Desc  string
+	Phone string
+	Find  string
+	Show  string
+	Exit  string
+}
+
+func LoadConfiguration(fileName string) *Commands {
+	file, _ := os.Open(fileName)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	command := Commands{}
+	err := decoder.Decode(&command)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	return &command
+}
 
 type Account struct {
 	userName  string
@@ -18,12 +46,15 @@ func NewDict() *Dict {
 	return &d
 }
 
-func (d *Dict) help() {
-	fmt.Println("/add to add new account")
-	fmt.Println("/all to see all accounts")
-	fmt.Println("/desc to see description of the account")
-	fmt.Println("/phone to see phone number of the account")
-	fmt.Println("/find to find by phone number")
+func (d *Dict) help(c *Commands) {
+	fmt.Printf("%s to add new account\n", c.Add)
+	fmt.Printf("%s to see all accounts\n", c.All)
+	fmt.Printf("%s to see description of the account\n", c.Desc)
+	fmt.Printf("%s to see phone number of the account\n", c.Phone)
+	fmt.Printf("%s to find account by phone number\n", c.Find)
+	fmt.Printf("%s to show all information about account\n", c.Show)
+	fmt.Printf("%s to exit\n", c.Exit)
+
 }
 
 func (d *Dict) add() {
@@ -81,29 +112,34 @@ func (d *Dict) find() {
 }
 
 func main() {
-	dict := NewDict()
+
+	command := LoadConfiguration("commands.json") //commands config
+
+	dict := NewDict() //new dictionary
+
+	//interaction
 	var input string
 	for {
 		fmt.Scan(&input)
 		switch input {
-		case "/help":
-			dict.help()
-		case "/add":
+		case command.Help:
+			dict.help(command)
+		case command.Add:
 			dict.add()
-		case "/all":
+		case command.All:
 			dict.all()
-		case "/phone":
+		case command.Phone:
 			dict.phone()
-		case "/desc":
+		case command.Desc:
 			dict.desc()
-		case "/find":
+		case command.Find:
 			dict.find()
-		case "/show":
+		case command.Show:
 			dict.show()
-		case "/exit":
+		case command.Exit:
 			break
 		default:
-			fmt.Println("/help for help")
+			fmt.Printf("%s for help\n", command.Help)
 		}
 	}
 }
