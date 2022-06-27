@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+	"github.com/spf13/viper"
+	"log"
 )
 
 //Commands config
@@ -19,13 +19,13 @@ type Commands struct {
 }
 
 func LoadConfiguration(fileName string) *Commands {
-	file, _ := os.Open(fileName)
-	defer file.Close()
-	decoder := json.NewDecoder(file)
-	command := Commands{}
-	err := decoder.Decode(&command)
-	if err != nil {
-		fmt.Println("error:", err)
+	viper.SetConfigFile(fileName)
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatal(err)
+	}
+	var command Commands
+	if err := viper.Unmarshal(&command); err != nil {
+		log.Fatal(err)
 	}
 	return &command
 }
@@ -113,7 +113,7 @@ func (d *Dict) find() {
 
 func main() {
 
-	command := LoadConfiguration("commands.json") //commands config
+	command := LoadConfiguration("./commands.json") //commands config
 
 	dict := NewDict() //new dictionary
 
@@ -137,7 +137,7 @@ func main() {
 		case command.Show:
 			dict.show()
 		case command.Exit:
-			break
+			return
 		default:
 			fmt.Printf("%s for help\n", command.Help)
 		}
