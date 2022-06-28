@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"log"
 )
 
 //Commands config
@@ -21,11 +20,11 @@ type Commands struct {
 func LoadConfiguration(fileName string) *Commands {
 	viper.SetConfigFile(fileName)
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	var command Commands
 	if err := viper.Unmarshal(&command); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	return &command
 }

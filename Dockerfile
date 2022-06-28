@@ -4,14 +4,11 @@ WORKDIR /app
 
 RUN mkdir build
 
-COPY go.mod ./build
-COPY go.sum ./build
-COPY *.json ./build
-COPY *.go ./build
+COPY . ./build/
 
 RUN cd build && \
   go mod tidy && \
-  go build main.go
+  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o main
 
 FROM alpine
 
@@ -20,4 +17,4 @@ WORKDIR /app
 COPY --from=build app/build/main ./
 COPY --from=build app/build/*.json ./
 
-CMD ["./main"]
+ENTRYPOINT ["./main"]
