@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -20,11 +21,11 @@ type Commands struct {
 func LoadConfiguration(fileName string) *Commands {
 	viper.SetConfigFile(fileName)
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println(err)
+		log.Panic("Read file error", err)
 	}
 	var command Commands
 	if err := viper.Unmarshal(&command); err != nil {
-		fmt.Println(err)
+		log.Panic("Parse file error", err)
 	}
 	return &command
 }
@@ -60,11 +61,23 @@ func (d *Dict) add() {
 	var account Account
 
 	fmt.Print("Enter your username:\n")
-	fmt.Scan(&account.userName)
+	_, err := fmt.Scan(&account.userName)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	fmt.Print("Enter your phone number:\n")
-	fmt.Scan(&account.userPhone)
+	_, err = fmt.Scan(&account.userPhone)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	fmt.Print("Enter your description:\n")
-	fmt.Scan(&account.userDesc)
+	_, err = fmt.Scan(&account.userDesc)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	d.dict[account.userName] = account
 }
 
@@ -77,14 +90,22 @@ func (d *Dict) all() {
 func (d *Dict) phone() {
 	var userName string
 	fmt.Print("Enter username:\n")
-	fmt.Scan(&userName)
+	_, err := fmt.Scan(&userName)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
 }
 
 func (d *Dict) desc() {
 	var userName string
 	fmt.Print("Enter username:\n")
-	fmt.Scan(&userName)
+	_, err := fmt.Scan(&userName)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
 }
 
@@ -92,7 +113,11 @@ func (d *Dict) show() {
 	var userName string
 
 	fmt.Print("Enter username:\n")
-	fmt.Scan(&userName)
+	_, err := fmt.Scan(&userName)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
 	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
 }
@@ -100,7 +125,11 @@ func (d *Dict) show() {
 func (d *Dict) find() {
 	var userPhone string
 	fmt.Print("Enter phone number:\n")
-	fmt.Scan(&userPhone)
+	_, err := fmt.Scan(&userPhone)
+	if err != nil {
+		log.Warnln(err)
+		return
+	}
 	for userName := range d.dict {
 		if userPhone == d.dict[userName].userPhone {
 			fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
@@ -119,7 +148,10 @@ func main() {
 	//interaction
 	var input string
 	for {
-		fmt.Scan(&input)
+		_, err := fmt.Scan(&input)
+		if err != nil {
+			log.Errorln(err)
+		}
 		switch input {
 		case command.Help:
 			dict.help(command)
