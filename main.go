@@ -150,7 +150,7 @@ func main() {
 	for {
 		_, err := fmt.Scan(&input)
 		if err != nil {
-			log.Errorln(err)
+			log.Warnln(err)
 		}
 		switch input {
 		case command.Help:
