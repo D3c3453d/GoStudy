@@ -8,14 +8,14 @@ import (
 
 //Commands config
 type Commands struct {
-	Help  string
-	Add   string
-	All   string
-	Desc  string
-	Phone string
-	Find  string
-	Show  string
-	Exit  string
+	Help  string `mapstructure:"HELP"`
+	Add   string `mapstructure:"ADD"`
+	All   string `mapstructure:"ALL"`
+	Desc  string `mapstructure:"DESC"`
+	Phone string `mapstructure:"PHONE"`
+	Find  string `mapstructure:"FIND"`
+	Show  string `mapstructure:"SHOW"`
+	Exit  string `mapstructure:"EXIT"`
 }
 
 func LoadConfiguration(fileName string) *Commands {
@@ -141,7 +141,7 @@ func (d *Dict) find() {
 
 func main() {
 
-	command := LoadConfiguration("./commands.json") //commands config
+	command := LoadConfiguration("./commands.env") //commands config
 
 	dict := NewDict() //new dictionary
 
