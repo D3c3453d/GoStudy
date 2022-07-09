@@ -16,5 +16,6 @@ WORKDIR /app
 
 COPY --from=build app/build/main ./
 COPY --from=build app/build/*.json ./
+COPY --from=build app/build/*.env ./
 
 ENTRYPOINT ["./main"]
