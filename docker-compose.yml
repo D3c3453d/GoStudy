@@ -1,0 +1,8 @@
+version: "1"
+
+services:
+  client:
+    build: .
+    env_file:
+      - commands.env
+
