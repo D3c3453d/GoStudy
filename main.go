@@ -20,6 +20,7 @@ type Commands struct {
 
 func LoadConfiguration(fileName string) *Commands {
 	viper.SetConfigFile(fileName)
+	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		log.Panic("Read file error", err)
 	}
