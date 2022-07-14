@@ -1,8 +1,16 @@
-version: "1"
+version: "3.3"
 
 services:
   client:
     build: .
     env_file:
       - commands.env
-
+    environment:
+      HELP: ${HELP}
+      ADD: ${ADD}
+      ALL: ${ALL}
+      DESC: ${DESC}
+      PHONE: ${PHONE}
+      FIND: ${FIND}
+      SHOW: ${SHOW}
+      EXIT: ${EXIT}
