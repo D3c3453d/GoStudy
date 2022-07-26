@@ -14,3 +14,19 @@ services:
       FIND: ${FIND}
       SHOW: ${SHOW}
       EXIT: ${EXIT}
+      POSTGRES_DB: "postgresdb"
+      POSTGRES_USER: "postgresuser"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+      - "8080:8080"
+
+  db:
+    image: postgres
+    volumes:
+      - ./.db/postgres/data:/var/lib/postgresql/data
+    environment:
+      #POSTGRES_DB: "postgresdb"
+      #POSTGRES_USER: "postgresuser"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+      - "5432:5432"

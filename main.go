@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/jackc/pgx/v4"
+	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -31,9 +33,24 @@ func LoadConfiguration(fileName string) *Commands {
 	return &command
 }
 
+func NewPostgresDB() (*sqlx.DB, error) {
+	db, err := sqlx.Connect("postgres", "host=db port=5432 user=postgresuser dbname=postgresdb password=qwerty sslmode=disable")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db, nil
+}
+
 type Account struct {
-	userName  string
-	userPhone string
+	userName  string `db:"name""`
+	userPhone string `db:"phone""`
 	userDesc  string
 }
 
@@ -58,7 +75,7 @@ func (d *Dict) help(c *Commands) {
 
 }
 
-func (d *Dict) add() {
+func add(tx *sqlx.Tx) {
 	var account Account
 
 	fmt.Print("Enter your username:\n")
@@ -79,7 +96,11 @@ func (d *Dict) add() {
 		log.Warnln(err)
 		return
 	}
-	d.dict[account.userName] = account
+	tx.MustExec("INSERT INTO accounts (name, phone, description) VALUES ($1, $2, $3)", "account.userName", "account.userPhone", "account.userDesc")
+	err = tx.Commit()
+	if err != nil {
+		log.Warnln(err)
+	}
 }
 
 func (d *Dict) all() {
@@ -141,6 +162,11 @@ func (d *Dict) find() {
 }
 
 func main() {
+	db, err := NewPostgresDB()
+	tx := db.MustBegin()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	command := LoadConfiguration("./commands.env") //commands config
 
@@ -157,7 +183,7 @@ func main() {
 		case command.Help:
 			dict.help(command)
 		case command.Add:
-			dict.add()
+			add(tx)
 		case command.All:
 			dict.all()
 		case command.Phone:
