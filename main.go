@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/jackc/pgx/v4"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -34,24 +34,26 @@ func LoadConfiguration(fileName string) *Commands {
 }
 
 func NewPostgresDB() (*sqlx.DB, error) {
-	db, err := sqlx.Connect("postgres", "host=db port=5432 user=postgresuser dbname=postgresdb password=qwerty sslmode=disable")
-
+	connstring := fmt.Sprintf(
+		"host=%s port=%d dbname=%s user=%s password=%s target_session_attrs=read-write",
+		"172.28.0.2", 5432, "postdb", "postuser", "qwerty")
+	db, err := sqlx.Connect("pgx", connstring)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Connect error: ", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Ping error: ", err)
 	}
 
 	return db, nil
 }
 
 type Account struct {
-	userName  string `db:"name""`
-	userPhone string `db:"phone""`
-	userDesc  string
+	userName  string `db:"name"`
+	userPhone string `db:"phone"`
+	userDesc  string `db:"description"`
 }
 
 type Dict struct {
@@ -96,20 +98,28 @@ func add(tx *sqlx.Tx) {
 		log.Warnln(err)
 		return
 	}
-	tx.MustExec("INSERT INTO accounts (name, phone, description) VALUES ($1, $2, $3)", "account.userName", "account.userPhone", "account.userDesc")
+	tx.Exec("INSERT INTO accounts (name, phone, description) VALUES ($1, $2, $3)", account.userName, account.userPhone, account.userDesc)
 	err = tx.Commit()
 	if err != nil {
 		log.Warnln(err)
 	}
 }
 
-func (d *Dict) all() {
-	for userName := range d.dict {
-		fmt.Println(userName)
+func (d *Dict) all(db *sqlx.DB) {
+	rows, err := db.Query("SELECT name FROM accounts")
+	if err != nil {
+		log.Warnln(err)
 	}
+	var name string
+	// iterate over each row
+	for rows.Next() {
+		err = rows.Scan(&name)
+		fmt.Println(name)
+	}
+	err = rows.Err()
 }
 
-func (d *Dict) phone() {
+func (d *Dict) phone(db *sqlx.DB) {
 	var userName string
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
@@ -117,10 +127,21 @@ func (d *Dict) phone() {
 		log.Warnln(err)
 		return
 	}
-	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
+	rows, err := db.Query("SELECT phone FROM accounts WHERE name=$1", userName)
+	if err != nil {
+		log.Warnln(err)
+	}
+	var userPhone string
+	// iterate over each row
+	for rows.Next() {
+		err = rows.Scan(&userPhone)
+		fmt.Printf("%s's phone: %s\n", userName, userPhone)
+	}
+	err = rows.Err()
+
 }
 
-func (d *Dict) desc() {
+func (d *Dict) desc(db *sqlx.DB) {
 	var userName string
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
@@ -128,23 +149,43 @@ func (d *Dict) desc() {
 		log.Warnln(err)
 		return
 	}
-	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
+	rows, err := db.Query("SELECT description FROM accounts WHERE name=$1", userName)
+	if err != nil {
+		log.Warnln(err)
+	}
+	var userDesc string
+	// iterate over each row
+	for rows.Next() {
+		err = rows.Scan(&userDesc)
+		fmt.Printf("%s's description: %s\n", userName, userDesc)
+	}
+	err = rows.Err()
 }
 
-func (d *Dict) show() {
+func (d *Dict) show(db *sqlx.DB) {
 	var userName string
-
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
 	if err != nil {
 		log.Warnln(err)
 		return
 	}
-	fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
-	fmt.Printf("%s's description: %s\n", userName, d.dict[userName].userDesc)
+	rows, err := db.Query("SELECT phone, description FROM accounts WHERE name=$1", userName)
+	if err != nil {
+		log.Warnln(err)
+	}
+	var userPhone string
+	var userDesc string
+	// iterate over each row
+	for rows.Next() {
+		err = rows.Scan(&userPhone, &userDesc)
+		fmt.Printf("%s's phone: %s\n", userName, userPhone)
+		fmt.Printf("%s's description: %s\n", userName, userDesc)
+	}
+	err = rows.Err()
 }
 
-func (d *Dict) find() {
+func (d *Dict) find(db *sqlx.DB) {
 	var userPhone string
 	fmt.Print("Enter phone number:\n")
 	_, err := fmt.Scan(&userPhone)
@@ -152,20 +193,21 @@ func (d *Dict) find() {
 		log.Warnln(err)
 		return
 	}
-	for userName := range d.dict {
-		if userPhone == d.dict[userName].userPhone {
-			fmt.Printf("%s's phone number: %s\n", userName, d.dict[userName].userPhone)
-			return
-		}
+	row := db.QueryRow("SELECT name FROM accounts WHERE phone=$1", userPhone)
+	var userName string
+	err = row.Scan(&userName)
+	if err == nil {
+		fmt.Printf("%s's phone: %s\n", userName, userPhone)
+	} else {
+		fmt.Println("Not found")
 	}
-	fmt.Println("Not found")
 }
 
 func main() {
 	db, err := NewPostgresDB()
 	tx := db.MustBegin()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Cant create", err)
 	}
 
 	command := LoadConfiguration("./commands.env") //commands config
@@ -185,15 +227,15 @@ func main() {
 		case command.Add:
 			add(tx)
 		case command.All:
-			dict.all()
+			dict.all(db)
 		case command.Phone:
-			dict.phone()
+			dict.phone(db)
 		case command.Desc:
-			dict.desc()
+			dict.desc(db)
 		case command.Find:
-			dict.find()
+			dict.find(db)
 		case command.Show:
-			dict.show()
+			dict.show(db)
 		case command.Exit:
 			return
 		default:
