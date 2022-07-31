@@ -1,19 +1,10 @@
-version: "3.3"
+version: "3.7"
 
 services:
   client:
     build: .
     env_file:
       - commands.env
-    environment:
-      HELP: ${HELP}
-      ADD: ${ADD}
-      ALL: ${ALL}
-      DESC: ${DESC}
-      PHONE: ${PHONE}
-      FIND: ${FIND}
-      SHOW: ${SHOW}
-      EXIT: ${EXIT}
     ports:
       - "8000:8000"
     networks:
@@ -21,13 +12,10 @@ services:
 
   db:
     image: postgres
-    container_name: pstgrs
     volumes:
       - ./.db/postgres/data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: postdb
-      POSTGRES_USER: postuser
-      POSTGRES_PASSWORD: qwerty
+    env_file:
+      - db.env
     ports:
       - "5432:5432"
     networks:
