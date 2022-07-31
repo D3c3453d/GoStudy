@@ -1,72 +1,14 @@
 package main
 
 import (
+	"GoStudy/pkg/repository"
 	"fmt"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/sirupsen/logrus"
 )
 
-//Commands config
-type Commands struct {
-	Help  string `mapstructure:"HELP"`
-	Add   string `mapstructure:"ADD"`
-	All   string `mapstructure:"ALL"`
-	Desc  string `mapstructure:"DESC"`
-	Phone string `mapstructure:"PHONE"`
-	Find  string `mapstructure:"FIND"`
-	Show  string `mapstructure:"SHOW"`
-	Exit  string `mapstructure:"EXIT"`
-}
-
-func LoadConfiguration(fileName string) *Commands {
-	viper.SetConfigFile(fileName)
-	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err != nil {
-		log.Panic("Read file error", err)
-	}
-	var command Commands
-	if err := viper.Unmarshal(&command); err != nil {
-		log.Panic("Parse file error", err)
-	}
-	return &command
-}
-
-func NewPostgresDB() (*sqlx.DB, error) {
-	connstring := fmt.Sprintf(
-		"host=%s port=%d dbname=%s user=%s password=%s target_session_attrs=read-write",
-		"172.28.0.2", 5432, "postdb", "postuser", "qwerty")
-	db, err := sqlx.Connect("pgx", connstring)
-	if err != nil {
-		log.Fatal("Connect error: ", err)
-	}
-
-	err = db.Ping()
-	if err != nil {
-		log.Fatal("Ping error: ", err)
-	}
-
-	return db, nil
-}
-
-type Account struct {
-	userName  string `db:"name"`
-	userPhone string `db:"phone"`
-	userDesc  string `db:"description"`
-}
-
-type Dict struct {
-	dict map[string]Account
-}
-
-func NewDict() *Dict {
-	var d Dict
-	d.dict = make(map[string]Account)
-	return &d
-}
-
-func (d *Dict) help(c *Commands) {
+func help(c *Commands) {
 	fmt.Printf("%s to add new account\n", c.Add)
 	fmt.Printf("%s to see all accounts\n", c.All)
 	fmt.Printf("%s to see description of the account\n", c.Desc)
@@ -83,32 +25,32 @@ func add(tx *sqlx.Tx) {
 	fmt.Print("Enter your username:\n")
 	_, err := fmt.Scan(&account.userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	fmt.Print("Enter your phone number:\n")
 	_, err = fmt.Scan(&account.userPhone)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	fmt.Print("Enter your description:\n")
 	_, err = fmt.Scan(&account.userDesc)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	tx.Exec("INSERT INTO accounts (name, phone, description) VALUES ($1, $2, $3)", account.userName, account.userPhone, account.userDesc)
 	err = tx.Commit()
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 	}
 }
 
-func (d *Dict) all(db *sqlx.DB) {
+func all(db *sqlx.DB) {
 	rows, err := db.Query("SELECT name FROM accounts")
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 	}
 	var name string
 	// iterate over each row
@@ -119,17 +61,17 @@ func (d *Dict) all(db *sqlx.DB) {
 	err = rows.Err()
 }
 
-func (d *Dict) phone(db *sqlx.DB) {
+func phone(db *sqlx.DB) {
 	var userName string
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	rows, err := db.Query("SELECT phone FROM accounts WHERE name=$1", userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 	}
 	var userPhone string
 	// iterate over each row
@@ -141,17 +83,17 @@ func (d *Dict) phone(db *sqlx.DB) {
 
 }
 
-func (d *Dict) desc(db *sqlx.DB) {
+func desc(db *sqlx.DB) {
 	var userName string
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	rows, err := db.Query("SELECT description FROM accounts WHERE name=$1", userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 	}
 	var userDesc string
 	// iterate over each row
@@ -162,17 +104,17 @@ func (d *Dict) desc(db *sqlx.DB) {
 	err = rows.Err()
 }
 
-func (d *Dict) show(db *sqlx.DB) {
+func show(db *sqlx.DB) {
 	var userName string
 	fmt.Print("Enter username:\n")
 	_, err := fmt.Scan(&userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	rows, err := db.Query("SELECT phone, description FROM accounts WHERE name=$1", userName)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 	}
 	var userPhone string
 	var userDesc string
@@ -185,12 +127,12 @@ func (d *Dict) show(db *sqlx.DB) {
 	err = rows.Err()
 }
 
-func (d *Dict) find(db *sqlx.DB) {
+func find(db *sqlx.DB) {
 	var userPhone string
 	fmt.Print("Enter phone number:\n")
 	_, err := fmt.Scan(&userPhone)
 	if err != nil {
-		log.Warnln(err)
+		logrus.Warnln(err)
 		return
 	}
 	row := db.QueryRow("SELECT name FROM accounts WHERE phone=$1", userPhone)
@@ -204,38 +146,44 @@ func (d *Dict) find(db *sqlx.DB) {
 }
 
 func main() {
-	db, err := NewPostgresDB()
+	command := NewCommandsConf("./commands.env")
+	dbconf := NewDBConf("./db.env")
+
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host:     "172.21.0.2",
+		Port:     "5432",
+		Username: dbconf.Username,
+		Password: dbconf.Password,
+		DBName:   dbconf.DBName,
+		SSLMode:  "disable",
+	})
 	tx := db.MustBegin()
 	if err != nil {
-		log.Fatal("Cant create", err)
+		logrus.Fatal("Cant create", err)
 	}
-
-	command := LoadConfiguration("./commands.env") //commands config
-
-	dict := NewDict() //new dictionary
 
 	//interaction
 	var input string
 	for {
 		_, err := fmt.Scan(&input)
 		if err != nil {
-			log.Warnln(err)
+			logrus.Warnln(err)
 		}
 		switch input {
 		case command.Help:
-			dict.help(command)
+			help(command)
 		case command.Add:
 			add(tx)
 		case command.All:
-			dict.all(db)
+			all(db)
 		case command.Phone:
-			dict.phone(db)
+			phone(db)
 		case command.Desc:
-			dict.desc(db)
+			desc(db)
 		case command.Find:
-			dict.find(db)
+			find(db)
 		case command.Show:
-			dict.show(db)
+			show(db)
 		case command.Exit:
 			return
 		default:
