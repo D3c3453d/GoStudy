@@ -4,23 +4,17 @@ services:
   client:
     build: .
     env_file:
-      - commands.env
+      - cfg/commands.env
     ports:
       - "8000:8000"
-    networks:
-      - mynet
+    links:
+      - db
 
   db:
     image: postgres
     volumes:
       - ./.db/postgres/data:/var/lib/postgresql/data
     env_file:
-      - db.env
+      - cfg/db.env
     ports:
       - "5432:5432"
-    networks:
-      - mynet
-
-networks:
-  mynet:
-    driver: bridge
