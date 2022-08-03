@@ -25,7 +25,7 @@ func main() {
 	})
 	tx := db.MustBegin()
 	if err != nil {
-		logrus.Fatal("Cant create", err)
+		logrus.Fatal("Cant create ", err)
 	}
 
 	//interaction
