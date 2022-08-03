@@ -15,8 +15,8 @@ func main() {
 	command.LoadConfig("./commands.env")
 	dbconf.LoadConfig("./db.env")
 
-	db, err := repository.NewPostgresDB(repository.Config{
-		Host:     "172.21.0.2",
+	db, err := postgres.NewPostgresDB(postgres.Config{
+		Host:     "db",
 		Port:     "5432",
 		Username: dbconf.Username,
 		Password: dbconf.Password,
