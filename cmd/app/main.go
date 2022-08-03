@@ -37,19 +37,19 @@ func main() {
 		}
 		switch input {
 		case command.Help:
-			help(command)
+			service.Help(&command)
 		case command.Add:
-			add(tx)
+			service.Add(tx)
 		case command.All:
-			all(db)
+			service.All(db)
 		case command.Phone:
-			phone(db)
+			service.Phone(db)
 		case command.Desc:
-			desc(db)
+			service.Desc(db)
 		case command.Find:
-			find(db)
+			service.Find(db)
 		case command.Show:
-			show(db)
+			service.Show(db)
 		case command.Exit:
 			return
 		default:
