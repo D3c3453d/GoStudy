@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"github.com/sirupsen/logrus"
@@ -16,15 +16,13 @@ type Commands struct {
 	Exit  string `mapstructure:"EXIT"`
 }
 
-func NewCommandsConf(fileName string) *Commands {
+func (command *Commands) LoadConfig(fileName string) {
 	viper.SetConfigFile(fileName)
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		logrus.Panic("Read file error", err)
 	}
-	var command Commands
 	if err := viper.Unmarshal(&command); err != nil {
 		logrus.Panic("Parse file error", err)
 	}
-	return &command
 }
