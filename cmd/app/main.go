@@ -10,8 +10,10 @@ import (
 )
 
 func main() {
-	command := NewCommandsConf("./commands.env")
-	dbconf := NewDBConf("./db.env")
+	var command config.Commands
+	var dbconf config.DBConfig
+	command.LoadConfig("./commands.env")
+	dbconf.LoadConfig("./db.env")
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     "172.21.0.2",
