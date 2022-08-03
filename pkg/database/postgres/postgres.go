@@ -1,7 +1,8 @@
-package repository
+package postgres
 
 import (
 	"fmt"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 )
