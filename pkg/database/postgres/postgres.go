@@ -7,6 +7,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	AccountsTable = "accounts"
+)
+
 type Config struct {
 	Host     string
 	Port     string
