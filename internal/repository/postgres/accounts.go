@@ -2,39 +2,58 @@ package postgres
 
 import (
 	"GoStudy/internal/model"
+	"GoStudy/pkg/database/postgres"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
-	"strings"
 )
 
-func Create(tx *sqlx.Tx, table string, account *model.Account) {
-	querystring := fmt.Sprintf(
-		"INSERT INTO %s (name, phone, description) VALUES (%s, %s, %s)",
-		table, account.UserName, account.UserPhone, account.UserDesc)
-	_, err := tx.Exec(querystring)
-	if err != nil {
-		logrus.Warnln(err)
-	}
-	err = tx.Commit()
-	if err != nil {
-		logrus.Warnln(err)
-	}
+type AccountsPostgres struct {
+	db *sqlx.DB
 }
 
-func Show(db *sqlx.DB, table string, selectparam []string) {
-	querystring := fmt.Sprintf(
-		"SELECT %s FROM %s",
-		strings.Join(selectparam, ", "), table)
-	rows, err := db.Query(querystring)
+func NewAccountsPostgres(db *sqlx.DB) *AccountsPostgres {
+	return &AccountsPostgres{db: db}
+}
+
+func (r *AccountsPostgres) Create(account model.Account) error {
+	tx, err := r.db.Begin()
 	if err != nil {
-		logrus.Warnln(err)
+		return err
 	}
-	data := make([]string, len(selectparam))
-	// iterate over each row
-	for rows.Next() {
-		err = rows.Scan(&data)
-		fmt.Printf("%s\n", strings.Join(data, " "))
+	var id int
+	createAccountsQuery := fmt.Sprintf(
+		"INSERT INTO %s (name, phone, description) VALUES ($1, $2, $3) RETURNING id", postgres.AccountsTable)
+	row := tx.QueryRow(createAccountsQuery, account.UserName, account.UserPhone, account.UserDesc)
+	if err := row.Scan(&id); err != nil {
+		tx.Rollback()
+		return err
 	}
-	err = rows.Err()
+	return tx.Commit()
+}
+
+func (r *AccountsPostgres) GetAll() ([]model.Account, error) {
+	var list []model.Account
+
+	query := fmt.Sprintf("SELECT * FROM %s", postgres.AccountsTable)
+	err := r.db.Select(&list, query)
+
+	return list, err
+}
+
+func (r *AccountsPostgres) GetByName(name string) ([]model.Account, error) {
+	var list []model.Account
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE name=$1", postgres.AccountsTable)
+	err := r.db.Select(&list, query, name)
+
+	return list, err
+}
+
+func (r *AccountsPostgres) GetByPhone(phone string) ([]model.Account, error) {
+	var list []model.Account
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE phone=$1", postgres.AccountsTable)
+	err := r.db.Select(&list, query, phone)
+
+	return list, err
 }
