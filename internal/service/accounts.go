@@ -3,16 +3,19 @@ package service
 import (
 	"GoStudy/internal/config"
 	"GoStudy/internal/model"
-	"GoStudy/internal/repository/postgres"
+	"GoStudy/internal/repository"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 )
 
 type AccountsService struct {
+	repo repository.Accounts
 }
 
-func Help(c *config.Commands) {
+func NewAccountsService(repo repository.Accounts) *AccountsService {
+	return &AccountsService{repo: repo}
+}
+
+func (s *AccountsService) Help(c *config.Commands) {
 	fmt.Printf("%s to add new account\n", c.Add)
 	fmt.Printf("%s to see all accounts\n", c.All)
 	fmt.Printf("%s to see description of the account\n", c.Desc)
@@ -23,115 +26,18 @@ func Help(c *config.Commands) {
 
 }
 
-func Add(tx *sqlx.Tx) {
-	var account model.Account
-
-	fmt.Print("Enter your username:\n")
-	_, err := fmt.Scan(&account.UserName)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	fmt.Print("Enter your phone number:\n")
-	_, err = fmt.Scan(&account.UserPhone)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	fmt.Print("Enter your description:\n")
-	_, err = fmt.Scan(&account.UserDesc)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	postgres.Create(tx, "accounts", &account)
+func (s *AccountsService) Create(account model.Account) error {
+	return s.repo.Create(account)
 }
 
-func All(db *sqlx.DB) {
-	selectparam := []string{"name", "phone", "description"}
-	postgres.Show(db, "accounts", selectparam)
+func (s *AccountsService) GetAll() ([]model.Account, error) {
+	return s.repo.GetAll()
 }
 
-func Phone(db *sqlx.DB) {
-	var userName string
-	fmt.Print("Enter username:\n")
-	_, err := fmt.Scan(&userName)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	rows, err := db.Query("SELECT phone FROM accounts WHERE name=$1", userName)
-	if err != nil {
-		logrus.Warnln(err)
-	}
-	var userPhone string
-	// iterate over each row
-	for rows.Next() {
-		err = rows.Scan(&userPhone)
-		fmt.Printf("%s's phone: %s\n", userName, userPhone)
-	}
-	err = rows.Err()
-
+func (s *AccountsService) GetByName(name string) ([]model.Account, error) {
+	return s.repo.GetByName(name)
 }
 
-func Desc(db *sqlx.DB) {
-	var userName string
-	fmt.Print("Enter username:\n")
-	_, err := fmt.Scan(&userName)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	rows, err := db.Query("SELECT description FROM accounts WHERE name=$1", userName)
-	if err != nil {
-		logrus.Warnln(err)
-	}
-	var userDesc string
-	// iterate over each row
-	for rows.Next() {
-		err = rows.Scan(&userDesc)
-		fmt.Printf("%s's description: %s\n", userName, userDesc)
-	}
-	err = rows.Err()
-}
-
-func Show(db *sqlx.DB) {
-	var userName string
-	fmt.Print("Enter username:\n")
-	_, err := fmt.Scan(&userName)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	rows, err := db.Query("SELECT phone, description FROM accounts WHERE name=$1", userName)
-	if err != nil {
-		logrus.Warnln(err)
-	}
-	var userPhone string
-	var userDesc string
-	// iterate over each row
-	for rows.Next() {
-		err = rows.Scan(&userPhone, &userDesc)
-		fmt.Printf("%s's phone: %s\n", userName, userPhone)
-		fmt.Printf("%s's description: %s\n", userName, userDesc)
-	}
-	err = rows.Err()
-}
-
-func Find(db *sqlx.DB) {
-	var userPhone string
-	fmt.Print("Enter phone number:\n")
-	_, err := fmt.Scan(&userPhone)
-	if err != nil {
-		logrus.Warnln(err)
-		return
-	}
-	row := db.QueryRow("SELECT name FROM accounts WHERE phone=$1", userPhone)
-	var userName string
-	err = row.Scan(&userName)
-	if err == nil {
-		fmt.Printf("%s's phone: %s\n", userName, userPhone)
-	} else {
-		fmt.Println("Not found")
-	}
+func (s *AccountsService) GetByPhone(phone string) ([]model.Account, error) {
+	return s.repo.GetByPhone(phone)
 }
