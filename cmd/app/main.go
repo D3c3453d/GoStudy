@@ -2,6 +2,8 @@ package main
 
 import (
 	"GoStudy/internal/config"
+	"GoStudy/internal/handler"
+	"GoStudy/internal/repository"
 	"GoStudy/internal/service"
 	"GoStudy/pkg/database/postgres"
 	"fmt"
@@ -23,10 +25,13 @@ func main() {
 		DBName:   dbconf.DBName,
 		SSLMode:  "disable",
 	})
-	tx := db.MustBegin()
 	if err != nil {
 		logrus.Fatal("Cant create ", err)
 	}
+
+	repos := repository.NewRepository(db)
+	services := service.NewService(repos)
+	handlers := handler.NewHandler(services)
 
 	//interaction
 	var input string
@@ -37,19 +42,19 @@ func main() {
 		}
 		switch input {
 		case command.Help:
-			service.Help(&command)
+			handlers.Help(&command)
 		case command.Add:
-			service.Add(tx)
+			handlers.Add()
 		case command.All:
-			service.All(db)
+			handlers.All()
 		case command.Phone:
-			service.Phone(db)
+			handlers.Phone()
 		case command.Desc:
-			service.Desc(db)
+			handlers.Desc()
 		case command.Find:
-			service.Find(db)
+			handlers.Find()
 		case command.Show:
-			service.Show(db)
+			handlers.Show()
 		case command.Exit:
 			return
 		default:
