@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"GoStudy/internal/service"
+	"GoStudy/internal/user/service"
 )
 
 type Handler struct {

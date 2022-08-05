@@ -2,8 +2,8 @@ package service
 
 import (
 	"GoStudy/internal/config"
-	"GoStudy/internal/model"
-	"GoStudy/internal/repository"
+	"GoStudy/internal/user/entity"
+	"GoStudy/internal/user/repository"
 	"fmt"
 )
 

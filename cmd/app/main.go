@@ -2,9 +2,9 @@ package main
 
 import (
 	"GoStudy/internal/config"
-	"GoStudy/internal/handler"
-	"GoStudy/internal/repository"
-	"GoStudy/internal/service"
+	"GoStudy/internal/user/handler"
+	"GoStudy/internal/user/repository"
+	"GoStudy/internal/user/service"
 	"GoStudy/pkg/database/postgres"
 	"fmt"
 	_ "github.com/jackc/pgx/v4/stdlib"

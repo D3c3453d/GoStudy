@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"GoStudy/internal/model"
+	"GoStudy/internal/user/entity"
 	"GoStudy/pkg/database/postgres"
 	"fmt"
 	"github.com/jmoiron/sqlx"

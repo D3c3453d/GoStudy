@@ -2,7 +2,7 @@ package handler
 
 import (
 	"GoStudy/internal/config"
-	"GoStudy/internal/model"
+	"GoStudy/internal/user/entity"
 	"fmt"
 	"github.com/sirupsen/logrus"
 )
