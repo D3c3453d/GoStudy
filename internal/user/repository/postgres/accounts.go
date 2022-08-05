@@ -25,7 +25,10 @@ func (r *AccountsPostgres) Create(account model.Account) error {
 		"INSERT INTO %s (name, phone, description) VALUES ($1, $2, $3) RETURNING id", postgres.AccountsTable)
 	row := tx.QueryRow(createAccountsQuery, account.UserName, account.UserPhone, account.UserDesc)
 	if err := row.Scan(&id); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return err
+		}
 		return err
 	}
 	return tx.Commit()
