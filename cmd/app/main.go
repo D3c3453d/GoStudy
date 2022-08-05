@@ -13,16 +13,16 @@ import (
 
 func main() {
 	var command config.Commands
-	var dbconf config.DBConfig
+	var dbConf config.DBConfig
 	command.LoadConfig("./commands.env")
-	dbconf.LoadConfig("./db.env")
+	dbConf.LoadConfig("./db.env")
 
 	db, err := postgres.NewPostgresDB(postgres.Config{
 		Host:     "db",
 		Port:     "5432",
-		Username: dbconf.Username,
-		Password: dbconf.Password,
-		DBName:   dbconf.DBName,
+		Username: dbConf.Username,
+		Password: dbConf.Password,
+		DBName:   dbConf.DBName,
 		SSLMode:  "disable",
 	})
 	if err != nil {
