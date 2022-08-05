@@ -11,7 +11,7 @@ func (h *Handler) Help(c *config.Commands) {
 	h.services.Help(c)
 }
 func (h *Handler) Add() {
-	var account model.Account
+	var account entity.Account
 
 	fmt.Print("Enter your username:\n")
 	_, err := fmt.Scan(&account.UserName)

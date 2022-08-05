@@ -8,10 +8,10 @@ import (
 )
 
 type AccountsService struct {
-	repo repository.Accounts
+	repo repository.AccountsReposI
 }
 
-func NewAccountsService(repo repository.Accounts) *AccountsService {
+func NewAccountsService(repo repository.AccountsReposI) *AccountsService {
 	return &AccountsService{repo: repo}
 }
 
@@ -26,18 +26,18 @@ func (s *AccountsService) Help(c *config.Commands) {
 
 }
 
-func (s *AccountsService) Create(account model.Account) error {
+func (s *AccountsService) Create(account entity.Account) error {
 	return s.repo.Create(account)
 }
 
-func (s *AccountsService) GetAll() ([]model.Account, error) {
+func (s *AccountsService) GetAll() ([]entity.Account, error) {
 	return s.repo.GetAll()
 }
 
-func (s *AccountsService) GetByName(name string) ([]model.Account, error) {
+func (s *AccountsService) GetByName(name string) ([]entity.Account, error) {
 	return s.repo.GetByName(name)
 }
 
-func (s *AccountsService) GetByPhone(phone string) ([]model.Account, error) {
+func (s *AccountsService) GetByPhone(phone string) ([]entity.Account, error) {
 	return s.repo.GetByPhone(phone)
 }
