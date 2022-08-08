@@ -21,11 +21,11 @@ type Config struct {
 }
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
-	connstring := fmt.Sprintf(
+	connectString := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName, cfg.SSLMode)
 
-	db, err := sqlx.Connect("pgx", connstring)
+	db, err := sqlx.Connect("pgx", connectString)
 	if err != nil {
 		logrus.Fatal("Connect error: ", err)
 	}
