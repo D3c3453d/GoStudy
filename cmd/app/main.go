@@ -2,7 +2,7 @@ package main
 
 import (
 	"GoStudy/internal/config"
-	"GoStudy/server"
+	"GoStudy/internal/server"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
