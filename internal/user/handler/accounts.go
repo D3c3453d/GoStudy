@@ -3,6 +3,7 @@ package handler
 import (
 	"GoStudy/internal/config"
 	"GoStudy/internal/user/entity"
+	"GoStudy/pkg/handler"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,12 +16,12 @@ func (h *Handler) add(c *gin.Context) {
 	var input entity.Account
 
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		handler.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	err := h.services.Create(input)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		handler.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"status": "added",
@@ -34,7 +35,7 @@ type allResponse struct {
 func (h *Handler) all(c *gin.Context) {
 	list, err := h.services.AccountsServiceI.GetAll()
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		handler.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -52,7 +53,15 @@ func (h *Handler) desc(c *gin.Context) {
 }
 
 func (h *Handler) show(c *gin.Context) {
+	name := c.Param("name")
 
+	list, err := h.services.AccountsServiceI.GetByName(name)
+	if err != nil {
+		handler.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, list)
 }
 
 func (h *Handler) find(c *gin.Context) {
@@ -60,7 +69,7 @@ func (h *Handler) find(c *gin.Context) {
 
 	list, err := h.services.AccountsServiceI.GetByPhone(phone)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		handler.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
