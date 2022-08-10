@@ -8,5 +8,5 @@ import (
 
 func main() {
 	cfg := config.NewConfig()
-	server.ConsoleApp(cfg)
+	server.NewApp(cfg)
 }
