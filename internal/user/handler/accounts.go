@@ -23,15 +23,15 @@ func (h *Handler) all(c *gin.Context) {
 	})
 }
 
-func (h *Handler) phone(c *gin.Context) {
+func (h *Handler) phoneByName(c *gin.Context) {
 
 }
 
-func (h *Handler) desc(c *gin.Context) {
+func (h *Handler) descByName(c *gin.Context) {
 
 }
 
-func (h *Handler) show(c *gin.Context) {
+func (h *Handler) showByName(c *gin.Context) {
 	name := c.Param("name")
 
 	list, err := h.services.AccountsServiceI.GetByName(name)
@@ -43,7 +43,7 @@ func (h *Handler) show(c *gin.Context) {
 	c.JSON(http.StatusOK, list)
 }
 
-func (h *Handler) find(c *gin.Context) {
+func (h *Handler) findByPhone(c *gin.Context) {
 	phone := c.Param("phone")
 
 	list, err := h.services.AccountsServiceI.GetByPhone(phone)
