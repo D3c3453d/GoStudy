@@ -1,4 +1,4 @@
-db: #it's run first
+db: #run first
 	docker compose up -d db
 server: #./cfg/db.env: POSTGRES_HOST=db
 	docker compose build server && docker compose up server
