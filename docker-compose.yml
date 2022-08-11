@@ -1,17 +1,21 @@
 version: "3.7"
 
 services:
-  client:
+  server:
+    container_name: server
     build: .
     env_file:
       - cfg/commands.env
     ports:
       - "8000:8000"
-    links:
-      - db
 
   db:
+    container_name: postgres_db
     image: postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - cfg/db.env
     volumes:
       - ./.db/postgres/data:/var/lib/postgresql/data
       - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
