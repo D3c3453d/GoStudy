@@ -25,7 +25,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		api.GET("/", h.all)
 
-		accounts := api.Group("/accounts")
+		accounts := api.Group("/accounts", h.userIdentity)
 		{
 			//accounts.POST("/", h.add)
 			accounts.GET("/", h.all)
