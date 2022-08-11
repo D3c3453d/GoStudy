@@ -1,32 +1,11 @@
 package handler
 
 import (
-	"GoStudy/internal/config"
 	"GoStudy/internal/user/entity"
 	"GoStudy/pkg/handler"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
-
-func (h *Handler) help(c *gin.Context, cfg *config.Commands) {
-	h.services.Help(cfg)
-}
-
-func (h *Handler) add(c *gin.Context) {
-	var input entity.Account
-
-	if err := c.BindJSON(&input); err != nil {
-		handler.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-	err := h.services.Create(input)
-	if err != nil {
-		handler.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
-	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"status": "added",
-	})
-}
 
 type allResponse struct {
 	Data []entity.Account `json:"accounts"`
