@@ -6,8 +6,12 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type AuthReposI interface {
+	Create(account entity.Account) (int, error)
+	GetUser(username, password string) (entity.Account, error)
+}
+
 type AccountsReposI interface {
-	Create(account entity.Account) error
 	GetAll() ([]entity.Account, error)
 	GetByName(name string) ([]entity.Account, error)
 	GetByPhone(phone string) ([]entity.Account, error)
@@ -15,10 +19,12 @@ type AccountsReposI interface {
 
 type Repository struct {
 	AccountsReposI
+	AuthReposI
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		AccountsReposI: postgres.NewAccountsPostgres(db),
+		AuthReposI:     postgres.NewAuthPostgres(db),
 	}
 }
