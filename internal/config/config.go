@@ -25,16 +25,18 @@ type DBConfig struct {
 	Username string `mapstructure:"POSTGRES_USER"`
 	Password string `mapstructure:"POSTGRES_PASSWORD"`
 	DBName   string `mapstructure:"POSTGRES_DB"`
+	Host     string `mapstructure:"POSTGRES_HOST"`
+	Port     string `mapstructure:"POSTGRES_PORT"`
 }
 
 func (conf *Commands) loadConfig(fileName string) {
 	viper.SetConfigFile(fileName)
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
-		logrus.Panic("Read file error", err)
+		logrus.Panic(err)
 	}
 	if err := viper.Unmarshal(&conf); err != nil {
-		logrus.Panic("Parse file error", err)
+		logrus.Panic(err)
 	}
 }
 
@@ -42,18 +44,18 @@ func (conf *DBConfig) loadConfig(fileName string) {
 	viper.SetConfigFile(fileName)
 	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
-		logrus.Panic("Read file error: ", err)
+		logrus.Panic(err)
 	}
 	if err := viper.Unmarshal(&conf); err != nil {
-		logrus.Panic("Parse file error: ", err)
+		logrus.Panic(err)
 	}
 }
 
 func NewConfig() *Config {
 	var command Commands
 	var dbConf DBConfig
-	command.loadConfig("./commands.env")
-	dbConf.loadConfig("./db.env")
+	command.loadConfig("./cfg/commands.env")
+	dbConf.loadConfig("./cfg/db.env")
 	Conf := Config{
 		Commands: command,
 		DBConfig: dbConf,
