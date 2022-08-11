@@ -2,8 +2,6 @@ FROM golang as build
 
 WORKDIR /app
 
-RUN mkdir build
-
 COPY . ./build/
 
 RUN cd build && \
@@ -15,6 +13,6 @@ FROM alpine
 WORKDIR /app
 
 COPY --from=build app/build/main ./
-COPY --from=build app/build/cfg/ ./
+COPY --from=build app/build/cfg/ ./cfg/
 
 ENTRYPOINT ["./main"]
