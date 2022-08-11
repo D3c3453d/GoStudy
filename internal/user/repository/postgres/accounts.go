@@ -15,25 +15,6 @@ func NewAccountsPostgres(db *sqlx.DB) *AccountsPostgres {
 	return &AccountsPostgres{db: db}
 }
 
-func (r *AccountsPostgres) Create(account entity.Account) error {
-	tx, err := r.db.Begin()
-	if err != nil {
-		return err
-	}
-	var id int
-	createAccountsQuery := fmt.Sprintf(
-		"INSERT INTO %s (name, phone, description) VALUES ($1, $2, $3) RETURNING id", postgres.AccountsTable)
-	row := tx.QueryRow(createAccountsQuery, account.UserName, account.UserPhone, account.UserDesc)
-	if err := row.Scan(&id); err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return err
-		}
-		return err
-	}
-	return tx.Commit()
-}
-
 func (r *AccountsPostgres) GetAll() ([]entity.Account, error) {
 	var list []entity.Account
 
