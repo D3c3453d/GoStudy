@@ -8,6 +8,7 @@ import (
 type AuthServiceI interface {
 	Create(account entity.Account) (int, error)
 	GenerateToken(name string, password string) (string, error)
+	ParseToken(token string) (int, error)
 }
 
 type AccountsServiceI interface {
