@@ -1,4 +1,6 @@
-build:
-	docker compose run -d db
-run:
-	docker compose build client && docker compose run client
+db:
+	docker compose up -d db
+server:
+	docker compose build server && docker compose up server
+down:
+	docker compose down
